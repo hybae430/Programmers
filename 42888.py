@@ -13,7 +13,6 @@ def solution(record):
             arr.append([tmp[1], 'L'])
         elif tmp[0] == 'Change':
             nname[tmp[1]] = tmp[2]
-        print(nname)
 
     for a in arr:
         if a[1] == 'E':
