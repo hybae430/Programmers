@@ -1,36 +1,50 @@
 # 순위 검색
-# 2022-01-02
+# 2022-01-2x
 
+from itertools import combinations
+from bisect import bisect_left      # 이진탐색용 (bisect_left는 왼쪽에서의 idx 찾는 기능)
+
+# 효율성코드 - 조건식을 전부 저장 후 점수만 이진탐색
 def solution(info, query):
-    answer, info2, query2, idx = [0 for i in range(len(query))], [], [], 0
+    answer = []
+    info_dict = {}
 
-    for i in info:
-        info2.append(i.split())
-    for i in query:
-        i = i.replace(" and ", " ")
-        query2.append(i.split())
+    for i in range(len(info)):
+        info_list = info[i].split()
+        ikey = info_list[:-1]
+        ival = info_list[-1]
 
-    for q in query2:
-        lang, side, car, food, score = q
-        for i in info2:
-            lang2, side2, car2, food2, score2 = i
-            if lang == lang2 or lang == "-":
-                if side == side2 or side == "-":
-                    if car == car2 or car == "-":
-                        if food == food2 or food == "-":
-                            if int(score) <= int(score2):
-                                answer[idx] += 1
-                            else:
-                                continue
-                        else:
-                            continue
-                    else:
-                        continue
+        for j in range(5):
+            # 모든 경우의 수
+            for c in combinations(ikey, j):
+                tmp = ''.join(c)
+                if tmp in info_dict:
+                    info_dict[tmp].append(int(ival))
                 else:
-                    continue
-            else:
-                continue
-        idx += 1
+                    info_dict[tmp] = [int(ival)]
+
+    for i in info_dict:
+        info_dict[i].sort()
+
+    for i in query:
+        query_list = i.split()
+        qkey = query_list[:-1]
+        qval = query_list[-1]
+
+        while 'and' in qkey:
+            qkey.remove('and')
+        while '-' in qkey:
+            qkey.remove('-')
+        qkey = ''.join(qkey)
+
+        if qkey in info_dict:
+            qry = info_dict[qkey]
+
+            if qry:
+                enter = bisect_left(qry, int(qval))
+                answer.append(len(qry) - enter)
+        else:
+            answer.append(0)
 
     return answer
 
